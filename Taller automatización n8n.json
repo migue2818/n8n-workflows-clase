@@ -1,0 +1,601 @@
+{
+  "name": "Taller clase Gestión I",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1ZKMKeFWMwrQ6bxxccQFjjLD8TA3E_N1i1xVbyUg5VhI",
+          "mode": "list",
+          "cachedResultName": "Ajustes TI",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ZKMKeFWMwrQ6bxxccQFjjLD8TA3E_N1i1xVbyUg5VhI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Tickets",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ZKMKeFWMwrQ6bxxccQFjjLD8TA3E_N1i1xVbyUg5VhI/edit#gid=0"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        208
+      ],
+      "id": "256f8477-201d-4824-b02f-56f8ef118fa0",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "dqOv0aU3YrY4TUQg",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "98165111-a58d-4478-8a05-c2271f4add3a",
+              "name": "id_ticket",
+              "value": "={{$json.id_ticket}}",
+              "type": "string"
+            },
+            {
+              "id": "3654e2b2-d351-4c81-ad49-023e82286ea3",
+              "name": "tipo",
+              "value": "={{$json.tipo}}",
+              "type": "string"
+            },
+            {
+              "id": "4bcb0860-1ed7-450d-bfe7-88dfb2b78f27",
+              "name": "descripcion",
+              "value": "={{$json.descripcion}}",
+              "type": "string"
+            },
+            {
+              "id": "318bf096-4be2-406a-9a70-11c7d032612a",
+              "name": "cliente",
+              "value": "={{$json.cliente}}",
+              "type": "string"
+            },
+            {
+              "id": "9c2e7893-c89f-4850-9759-452073abb61d",
+              "name": "email_responsable",
+              "value": "={{ $json.email_responsable }}",
+              "type": "string"
+            },
+            {
+              "id": "066d486e-9292-4927-bf96-d32722935dbf",
+              "name": "responsable",
+              "value": "={{ $json.responsable }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "ignoreConversionErrors": false,
+          "dotNotation": true
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        176,
+        208
+      ],
+      "id": "aed16874-904c-4175-96ba-5d55b54c5398",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.tipo }}",
+                    "rightValue": "Financiero",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "b144119e-9b8a-412b-8897-9829d5ec33c4"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "404d4917-f637-4726-85f6-5ce17f2c7c1d",
+                    "leftValue": "={{ $json.tipo }}",
+                    "rightValue": "Técnico",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f15ad0df-88f4-446d-b3c8-7c3be9ab2df2",
+                    "leftValue": "={{ $json.tipo }}",
+                    "rightValue": "Administrativo",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        384,
+        208
+      ],
+      "id": "401ee385-1c5c-44fa-98be-353790652018",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const sla = Number($json.sla_horas || 0);\n\nconst fechaLimite = new Date();\nfechaLimite.setHours(fechaLimite.getHours() + sla);\n\nreturn {\n  json: {\n    ...$json,\n    fecha_limite: fechaLimite.toISOString(),\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1056,
+        240
+      ],
+      "id": "e4aea308-ea0c-4bd7-9240-117b830eb329",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3818432f-5e97-4433-972b-ba03bbf117ad",
+              "name": "responsable",
+              "value": "={{ $json.responsable }}",
+              "type": "string"
+            },
+            {
+              "id": "5f2556c7-565b-48de-b5cb-96f6064842c8",
+              "name": "email_responsable",
+              "value": "={{ $json.email_responsable }}",
+              "type": "string"
+            },
+            {
+              "id": "37bdc2d7-8c79-462d-8995-fe06514211c1",
+              "name": "sla_horas",
+              "value": "={{ $('Google Sheets Trigger').item.json.sla_horas }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        704,
+        240
+      ],
+      "id": "aadb598e-070a-4251-b881-8de74fe3e7bf",
+      "name": "Técnico"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "982479e8-b830-4961-b7cb-6e415965b1fa",
+              "name": "responsable",
+              "value": "={{ $('Google Sheets Trigger').item.json.responsable }}",
+              "type": "string"
+            },
+            {
+              "id": "2e613fbb-0ca0-46a8-9a28-349d171f8cb1",
+              "name": "email_responsable",
+              "value": "={{ $json.email_responsable }}",
+              "type": "string"
+            },
+            {
+              "id": "c5ccee86-e6ed-4b4d-9a92-858153a298b5",
+              "name": "sla_horas",
+              "value": "={{ $('Google Sheets Trigger').item.json.sla_horas }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        704,
+        80
+      ],
+      "id": "16af39e1-f373-4897-86ca-6e39df7536e8",
+      "name": "Financiero"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e89d17a7-68c2-41b1-9c1c-e22f27895fe3",
+              "name": "responsable",
+              "value": "={{ $json.responsable }}",
+              "type": "string"
+            },
+            {
+              "id": "b0a769d3-7762-40db-9d9c-f02b65ca7d84",
+              "name": "email_responsable",
+              "value": "={{ $json.email_responsable }}",
+              "type": "string"
+            },
+            {
+              "id": "1295a6da-55cf-4bfe-bfbb-bb949a96d90d",
+              "name": "sla_horas",
+              "value": "={{ $('Google Sheets Trigger').item.json.sla_horas }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        704,
+        416
+      ],
+      "id": "2d48d323-112c-4811-8f35-f0864c16180c",
+      "name": "Administrativo"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1ZKMKeFWMwrQ6bxxccQFjjLD8TA3E_N1i1xVbyUg5VhI",
+          "mode": "list",
+          "cachedResultName": "Ajustes TI",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ZKMKeFWMwrQ6bxxccQFjjLD8TA3E_N1i1xVbyUg5VhI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Tickets",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ZKMKeFWMwrQ6bxxccQFjjLD8TA3E_N1i1xVbyUg5VhI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "responsable": "={{$json.responsable}}",
+            "sla_horas": "={{$json.sla_horas}}",
+            "fecha_limite": "={{$json.fecha_limite}}",
+            "id_ticket": "={{$json.id_ticket}}"
+          },
+          "matchingColumns": [
+            "id_ticket"
+          ],
+          "schema": [
+            {
+              "id": "id_ticket",
+              "displayName": "id_ticket",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "tipo",
+              "displayName": "tipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "descripcion",
+              "displayName": "descripcion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "cliente",
+              "displayName": "cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "estado",
+              "displayName": "estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "responsable",
+              "displayName": "responsable",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email_responsable",
+              "displayName": "email_responsable",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "sla_horas",
+              "displayName": "sla_horas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fecha_limite",
+              "displayName": "fecha_limite",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1264,
+        240
+      ],
+      "id": "0dda8e25-dac3-46f1-bc40-11c91ca40bb5",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "9cSpcdAMArhYIvjB",
+          "name": "Google Sheets account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Google Sheets Trigger').item.json.email_responsable }}",
+        "subject": "=Nuevo Ticket {{$json.id_ticket}}",
+        "emailType": "text",
+        "message": "=Hola {{$json.responsable}},  Se te ha asignado un nuevo ticket.  ID: {{$json.id_ticket}} Tipo{{ $('Google Sheets Trigger').item.json.tipo }}: Cliente:{{ $('Google Sheets Trigger').item.json.cliente }}  Fecha límite: {{$json.fecha_limite}}  Por favor gestionarlo dentro del SLA establecido.  Gracias.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1472,
+        240
+      ],
+      "id": "cd94598f-1afe-404a-bb52-a540f6c8218c",
+      "name": "Send a message",
+      "webhookId": "13f5c78c-bd47-4a9b-be12-de956be6c266",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "lIYRzakckBHA77GC",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Financiero",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Técnico",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Administrativo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Técnico": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Financiero": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Administrativo": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "6e7ccdf9-2163-45dc-a62b-83cd4a425f8e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f894907fba1bf1275ca952ac684bc55afe7df86868d69383c94d9a1ab6971cfb"
+  },
+  "id": "BL7Wxqn4uDz8mYZT",
+  "tags": []
+}
